@@ -41,7 +41,7 @@ let server = app.listen();
 Most options based on [http-proxy](https://github.com/nodejitsu/node-http-proxy). 
 * host: the end point server
 * context: the request url contains the 'context' will be proxy
-* next: Call next() middleware upon success, and save the response as the ctx.body and setting ctx.proxySuccess as true. Note: The response is returned from the proxy, so this is not a way to modify the response, but merely a way to use the data if you want to perform something further inside your application.
+* callNext: Call next() middleware upon success, and save the response as the ctx.body and setting ctx.proxySuccess as true. Note: The response is returned from the proxy, so this is not a way to modify the response, but merely a way to use the data if you want to perform something further inside your application.
 
 # License
 MIT License

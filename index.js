@@ -15,7 +15,7 @@ class Proxy {
             if (!ctx.url.startsWith(context)){
                 return next();
             }
-            const { logs, rewrite, next } = options;
+            const { logs, rewrite, callNext } = options;
             options.headers = ctx.request.headers;
             return new Promise((resolve, reject) => {
                 if (logs){
@@ -25,7 +25,7 @@ class Proxy {
                     ctx.req.url = rewrite(ctx.url);
                 }
                 proxyServer.web(ctx.req, ctx.res, options);
-                if(next) {
+                if(callNext) {
                     proxyServer.on('proxyRes', function(proxyRes, req, res){
                         proxyRes.on('data' , function(dataBuffer){
                             var data = dataBuffer.toString('utf8');
@@ -51,7 +51,7 @@ class Proxy {
                         xfwd: true,
                         rewrite: proxy.rewrite?path => path.replace(pattern, ''):"",
                         logs: true,
-                        next: proxy.next || false,
+                        callNext: proxy.callNext || false,
                     }
                 ));
             })
