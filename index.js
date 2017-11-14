@@ -15,7 +15,7 @@ class Proxy {
             if (!ctx.url.startsWith(context)){
                 return next();
             }
-            const { logs, rewrite } = options;
+            const { logs, rewrite, next } = options;
             options.headers = ctx.request.headers;
             return new Promise((resolve, reject) => {
                 if (logs){
@@ -24,7 +24,17 @@ class Proxy {
                 if (typeof rewrite === 'function') {
                     ctx.req.url = rewrite(ctx.url);
                 }
-                proxyServer.web(ctx.req, ctx.res, options)
+                proxyServer.web(ctx.req, ctx.res, options);
+                if(next) {
+                    proxyServer.on('proxyRes', function(proxyRes, req, res){
+                        proxyRes.on('data' , function(dataBuffer){
+                            var data = dataBuffer.toString('utf8');
+                            ctx.body = data;
+                            ctx.proxySuccess = true;
+                            next();
+                        });
+                    });
+                }
             })
         }
     }
@@ -40,7 +50,8 @@ class Proxy {
                         changeOrigin: true,
                         xfwd: true,
                         rewrite: proxy.rewrite?path => path.replace(pattern, ''):"",
-                        logs: true
+                        logs: true,
+                        next: proxy.next || false,
                     }
                 ));
             })
